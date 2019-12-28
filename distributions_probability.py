@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from iminuit import Minuit
@@ -36,22 +35,22 @@ p = 18/37
 x = np.linspace(xmin, xmax, 1000)
 y = func_binomial_pmf(x, n, p)
 
-# plotify.plot(
-#   x=x,
-#   y=y,
-#   title="Binomial PDF of Little Pete's Winning Probabilities",
-#   xlabel="Number of Successes",
-#   ylabel="P",
-#   show_plot=False,
-#   save=False
-# )
+plotify.plot(
+  x=x,
+  y=y,
+  title="Binomial PDF of Little Pete's Winning Probabilities",
+  xlabel="Number of Successes",
+  ylabel="P",
+  show_plot=False,
+  save=False
+)
 
-# x_from_26 = np.linspace(26, xmax, 1000)
-# y_from_26 = func_binomial_pmf(x_from_26, n, p)
-# plt.fill_between(x_from_26, y_from_26, alpha=0.3, color=plotify.c_orange)
-# plt.legend({'P of winning at least 26 times', 'Binomial Distribution'}, facecolor="#282D33")
-# plt.savefig(('plots/' + 'casino_binomial'), facecolor=plotify.background_color, dpi=180)
-# plt.show()
+x_from_26 = np.linspace(26, xmax, 1000)
+y_from_26 = func_binomial_pmf(x_from_26, n, p)
+plt.fill_between(x_from_26, y_from_26, alpha=0.3, color=plotify.c_orange)
+plt.legend({'P of winning at least 26 times', 'Binomial Distribution'}, facecolor="#282D33")
+plt.savefig(('plots/' + 'casino_binomial'), facecolor=plotify.background_color, dpi=180)
+plt.show()
 
 pete_wins_25 = func_binomial_pmf(25, n, p)
 print(f'pete_wins_25 = {pete_wins_25}')
@@ -110,20 +109,20 @@ I_gaussian = quad(func_gaussian_pdf, 1.25, 2.5, args=(0, 1), epsabs=200)
 gaussian_result = I_gaussian[0] * 2
 print(f'gaussian_result = {gaussian_result}')
 
-# plotify.plot(x,
-#              y,
-#              show_plot=False,
-#              title='Gaussian with values between 1.25 and 2.5 σs aways from the mean',
-#              xlabel="",
-#              ylabel="")
+plotify.plot(x,
+             y,
+             show_plot=False,
+             title='Gaussian with values between 1.25 and 2.5 σs aways from the mean',
+             xlabel="",
+             ylabel="")
 
-# x_fill_1 = np.linspace(-2.5, -1.25, 1000)
-# y_fill_1 = func_gaussian_pdf(x_fill_1, 0, 1)
-# x_fill_2 = np.linspace(1.25, 2.5, 1000)
-# y_fill_2 = func_gaussian_pdf(x_fill_2, 0, 1)
-# plt.fill_between(x_fill_1, y_fill_1, alpha=0.5, color=plotify.c_orange)
-# plt.fill_between(x_fill_2, y_fill_2, alpha=0.5, color=plotify.c_orange)
-# plt.show()
+x_fill_1 = np.linspace(-2.5, -1.25, 1000)
+y_fill_1 = func_gaussian_pdf(x_fill_1, 0, 1)
+x_fill_2 = np.linspace(1.25, 2.5, 1000)
+y_fill_2 = func_gaussian_pdf(x_fill_2, 0, 1)
+plt.fill_between(x_fill_1, y_fill_1, alpha=0.5, color=plotify.c_orange)
+plt.fill_between(x_fill_2, y_fill_2, alpha=0.5, color=plotify.c_orange)
+plt.show()
 
 # ------------------------------------------ #
 # -------------- Exercise 1.3 -------------- #
@@ -137,18 +136,15 @@ def func_poisson_pmf(x, lamb):
     return poisson.pmf(np.floor(x+0.5), lamb)
 
 def integrate_poisson(lamb):
-    upper_bound = 300
     days_list = []
 
-    for x in range(8, upper_bound):
+    for x in range(0, 8):
         n_day_with_x_delays = func_poisson_pmf(x, lamb) * 365
         days_list.append(n_day_with_x_delays)
 
-        if n_day_with_x_delays < 0.00001:
-            break
-
     cumulative_days = sum(days_list)
-    return cumulative_days
+    return 365 - cumulative_days
+
 
 
 def cumulative_days_func(lamb):
@@ -165,10 +161,7 @@ Lambda = res.x
 print(f'res.x = {res.x}')
 
 result = integrate_poisson (Lambda)
-print(f'result = {result}')
-
-# def func_poisson_dist_equation(x, lamb):
-#     return (lamb**x * 2 * math.e ** -lamb) / math.factorial(x)
+print(f'result = {result}') 
 
 x = np.linspace(0, 20, 1000)
 y = func_poisson_pmf(x, Lambda) * 365 # to have the integral equal 365 instead of 1, which will make
