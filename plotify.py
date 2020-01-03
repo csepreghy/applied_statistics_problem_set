@@ -288,7 +288,7 @@ class Plotify:
 
     return fig, ax
 
-  def get_figax(self, is3d=False, figsize=(8, 6)):
+  def get_figax(self, is3d=False, figsize=(8, 6), use_grid=True):
     fig, ax = plt.subplots(figsize=figsize)
     fig.patch.set_facecolor(self.background_color)
 
@@ -296,7 +296,7 @@ class Plotify:
     ax.tick_params(colors=self.c_white)
     ax.xaxis.label.set_color(self.c_white)
     ax.yaxis.label.set_color(self.c_white)
-    ax.grid(self.use_grid, color=self.grid_color)
+    ax.grid(use_grid, color=self.grid_color)
 
     return fig, ax
 
