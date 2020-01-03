@@ -9,7 +9,6 @@ from scipy.optimize import minimize
 import math
 
 from plotify import Plotify
-from ExternalFunctions import nice_string_output, add_text_to_ax, Chi2Regression, integrate1d
 
 # plotify is a skin over matplotlib I wrote to automate styling of plots
 # https://github.com/csepreghy/plotify
