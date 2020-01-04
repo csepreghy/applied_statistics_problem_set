@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from iminuit import Minuit
-import sys
 from scipy import stats
 from scipy.stats import binom, poisson, norm
 from scipy.integrate import quad, simps
@@ -155,7 +154,7 @@ def exercise_1_3():
     Lambda = res.x
     print(f'res.x = {res.x}')
 
-    result = integrate_poisson (Lambda)
+    result = integrate_poisson(Lambda)
     print(f'result = {result}') 
 
     xvals = np.linspace(0, 20, 1000)
