@@ -7,8 +7,11 @@ import math
 from scipy.integrate import quad, simps
 from scipy.optimize import minimize
 from scipy import stats
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import pearsonr, spearmanr, chisquare
+
 from minepy import MINE
+
+from sklearn.feature_selection import chi2 as skchi2
 
 from distributions_probability import func_gaussian_pdf
 from read_ufo_sightings import read_ufo_sightings
@@ -95,8 +98,6 @@ def exercise_4_1_2():
   print('Spearman correlation: %.3f' % spearman_correlation)
 
 west_day_of_week = DayOfWeek[west_indeces]
-print(f'west_day_of_week = {west_day_of_week}')
-
 
 # plt.show()
 
@@ -109,21 +110,17 @@ saturdays = np.count_nonzero(west_day_of_week==5)
 sundays = np.count_nonzero(west_day_of_week==6)
 
 alldays = [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]
-print(f'alldays = {alldays}')
 
 alldays_mean = np.mean(alldays)
-print(f'alldays_mean = {alldays_mean}')
 alldays_std = np.std(alldays)
-print(f'alldays_std = {alldays_std}')
 ndof = 6
 
-chi2_value = 0
-for day in alldays:
-  chi2_value += (day - alldays_mean) ** 2 / alldays_std ** 2
+allday_means = np.array([alldays_mean] * len(alldays))
 
-p_chi2 = stats.chi2.sf(chi2_value, ndof)
-print(f'p_chi2 = {p_chi2}')
+chi2_value, chi2_p = chisquare(alldays)
 print(f'chi2_value = {chi2_value}')
+print(f'chi2_p = {chi2_p}')
+
 
 n_bins = 7
 
@@ -141,18 +138,11 @@ plt.show()
 mon_thu = [mondays, tuesdays, wednesdays, thursdays]
 
 mon_thu_mean = np.mean(mon_thu)
-print(f'mon_thu_mean = {mon_thu_mean}')
 mon_thu_std = np.std(mon_thu)
-print(f'mon_thu_std = {mon_thu_std}')
-ndof = 6
 
-chi2_value = 0
-for day in mon_thu:
-  chi2_value += (day - mon_thu_mean) ** 2 / mon_thu_std ** 2
-
-p_chi2 = stats.chi2.sf(chi2_value, ndof)
-print(f'p_chi2 = {p_chi2}')
+chi2_value, chi2_p = chisquare(mon_thu)
 print(f'chi2_value = {chi2_value}')
+print(f'p_chi2 = {chi2_p}')
 
 n_bins = 4
 
