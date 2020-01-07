@@ -6,6 +6,7 @@ import math
 
 from scipy.integrate import quad, simps
 from scipy.optimize import minimize
+from scipy.stats import pearsonr, spearmanr, chisquare, norm
 
 from distributions_probability import func_gaussian_pdf
 from plotify import Plotify
@@ -34,14 +35,17 @@ def integrate_pdf(C):
 x0 = 0.66
 result = minimize(integrate_pdf, x0, method='Nelder-Mead', tol=1e-10)
 C = result.x
+print(f'C = {C}')
 
 for i in range(len(xvals)):
   yvals[i] = pdf(xvals[i], C, a)
 
 value_squares = yvals ** 2
 rms = np.sqrt(np.sum(value_squares) / len(value_squares))
+y_mean = np.mean(yvals)
+print(f'y_mean = {y_mean}')
 
-n_points = 500
+n_points = 1000
 n_bins = 10
 xmin = 0
 xmax = 2
@@ -64,8 +68,6 @@ def von_neumann(f, xmin, xmax, ymin, ymax, N_points, f_arg=()):
     
   return x_accepted, hello_x, hello_y
 
-
-
 accepted_x_vals, hello_x, hello_y = von_neumann(pdf, xmin, xmax, ymin, ymax, N_points=n_points, f_arg=C)
 
 xvals = np.linspace(0, 2, n_points)
@@ -77,12 +79,52 @@ for i in range(len(xvals)):
 fig, ax = plotify.get_figax()
 
 ax.plot(xvals, yvals, c=plotify.c_blue)
-ax.hist(accepted_x_vals, bins=n_bins, range=(0, 2), histtype='step', label='histogram', color=plotify.c_orange)
-plt.show()
+ax.hist(accepted_x_vals, bins=n_bins, range=(0, 2), histtype='step', label='histogram', color=plotify.c_orange, linewidth=2)
+ax.set_xlabel("Randomly Sampled Value")
+ax.set_ylabel("Number Of Sampled Values")
+ax.set_title("Sampling Values According f(x)")
+ax.legend({'Number of Sampled Values', 'Probability Distribution'}, facecolor="#282D33", loc="upper left")
 
 
-def pdf_to_minimize(x, C, a):
-  result = C * (1 - math.exp(-a * x))
+plt.savefig(('plots/' + 'monte_carlo'), facecolor=plotify.background_color, dpi=180)
+
+# plt.show()
+
+
+def pdf_to_minimize(a):
+  sample_values = accepted_x_vals
+  expected_values = np.zeros(len(sample_values))
+  for i in range(len(sample_values)):
+    expected_values[i] = pdf(sample_values[i], C, a)
+
+  chi2_value, chi2_pval = chisquare(sample_values, expected_values)
+
+  return chi2_value
+
+x0 = 2
+res = minimize(pdf_to_minimize, x0, method='Nelder-Mead', tol=1e-9)
+
+# print(f'res.x = {res.x}')
+
+sample_values = accepted_x_vals
+expected_values = np.zeros(len(sample_values))
+for i in range(len(sample_values)):
+  expected_values[i] = pdf(sample_values[i], C, 2)
+
+chi2_value, chi2_pval = chisquare(sample_values, expected_values)
+# print(f'chi2_value = {chi2_value}')
+# print(f'chi2_pval = {chi2_pval}')
+
+all_accepted_x_vals = []
+
+for i in range(1000):
+  accepted_x_vals, _, _ = von_neumann(pdf, xmin, xmax, ymin, ymax, N_points=5, f_arg=C)
+  all_accepted_x_vals.append(accepted_x_vals)
+
+
+hell = len(accepted_x_vals)
+print(f'hell = {hell}')
+
 
 # def chi2(xvals, yvals, n_parameters):
 #   expected_values = np.zeros
@@ -122,7 +164,7 @@ for i in range(len(x_ulfit)):
 
 
 ax2.plot(x_ulfit, y_ulfit, '--', color='white', linewidth=2, label='Fit (unbinned LLH)')
-plt.show()
+# plt.show()
 
 print(f'rms = {rms}')
 

@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
 from iminuit import Minuit
 from scipy import stats
 from scipy.stats import binom, poisson, norm
@@ -145,11 +147,12 @@ def exercise_1_2():
     y_fill_2 = func_gaussian_pdf(x_fill_2, 0, 1)
     plt.fill_between(x_fill_1, y_fill_1, alpha=0.5, color=plotify.c_orange)
     plt.fill_between(x_fill_2, y_fill_2, alpha=0.5, color=plotify.c_orange)
+    plt.legend({'Gaussian', 'Between 1.2σ and 2.5σ from the mean'}, facecolor="#282D33")
+    plt.savefig(('plots/' + 'gaussian_integrated'), facecolor=plotify.background_color, dpi=180)
     plt.show()
 
 def exercise_1_3():
     x0 = 4
-    # I know Iminuit is better but I'm used to scipy
     res = minimize(cumulative_days_func, x0, method='Nelder-Mead', tol=1e-9)
     Lambda = res.x
     print(f'res.x = {res.x}')
@@ -160,20 +163,28 @@ def exercise_1_3():
     xvals = np.linspace(0, 20, 1000)
     y = func_poisson_pmf(xvals, Lambda) * 365 # to have the integral equal 365 instead of 1, which will make
 
-
-    plotify.plot(xvals, y, tickfrequencyone=True, show_plot=False)
+    fig, ax = plotify.get_figax()
+    ax.plot(xvals, y, color=plotify.c_orange) 
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    ax.set_title("Number of Days per Year for each number of delays")
+    ax.set_xlabel("Number of delays per day")
+    ax.set_ylabel("Number of Days")
 
     x_from_8 = np.linspace(8, 20, 1000)
     y_from_8 = func_poisson_pmf(x_from_8, Lambda) * 365
 
-    plt.fill_between(x_from_8, y_from_8, alpha=0.5, color=plotify.c_orange)
+    ax.fill_between(x_from_8, y_from_8, alpha=0.5, color=plotify.c_orange)
+    ax.plot([], [], ' ', label="Extra label on the legend")
+    ax.legend({'Days with n delays', 'Days with more than 7 delays', 'λ = 4.01538'}, facecolor="#282D33")
+
+    plt.savefig(('plots/' + 's_train'), facecolor=plotify.background_color, dpi=180)
     plt.show()
 
 
 def main():
-    exercise_1_1_1()
-    exercise_1_1_2()
-    exercise_1_2()
+    # exercise_1_1_1()
+    # exercise_1_1_2()
+    # exercise_1_2()
     exercise_1_3()
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import matplotlib.ticker as ticker
 
 from iminuit import Minuit
 from scipy import stats
+from scipy.stats import pearsonr, spearmanr, chisquare, normaltest
 import math
 
 from distributions_probability import func_gaussian_pdf
@@ -57,20 +58,26 @@ def exercise_2_1():
   ax.set_title("Measurements With Uncertainties")
   ax.set_xlabel("Measurement Number")
   ax.set_ylabel("Value / Uncertainty")
-  plt.show()
+  # plt.savefig(('plots/' + 'measuremens_uncertainties'), facecolor=plotify.background_color, dpi=180)
+  # plt.show()
 
 
   values_B = np.array([2.69,2.71,2.56,2.48,2.34,2.79,2.54,2.68,2.69,2.58,2.66,2.70])
   values_mean_B = np.mean(values_B)
   uncertainty_B = np.std(values_B)
+  print(f'uncertainty_B = {uncertainty_B}')
   n_parameters_B = 1
 
-  print(f'uncertainty_B.shape = {uncertainty_B.shape}')
+  statistic, pvalue = normaltest(values_B)
+  print(f'statistic = {statistic}')
+  print(f'pvalue = {pvalue}')
 
   chi2_value_B, p_chi2_B = chi2(values_B, uncertainty_B, n_parameters_B) 
-
+  chi2_value_hello, chi2_p_hello = chisquare(values_B)
   print(f'chi2_value_B = {chi2_value_B}')
   print(f'p_chi2_B = {p_chi2_B}')
+  print(f'chi2_value_hello = {chi2_value_hello}')
+  print(f'chi2_p_hello = {chi2_p_hello}')
 
   x_B = np.linspace(2.1, 3.1, 1000)
   y_B = func_gaussian_pdf(x_B, values_mean_B, uncertainty_B)
@@ -79,12 +86,31 @@ def exercise_2_1():
 
   ax.plot(x_B, y_B, c=plotify.c_orange)
   ax.scatter(x=values_B, 
-            y=[0] * len(values_B),
-            c=plotify.c_orange)
+             y=[0] * len(values_B),
+             c=plotify.c_orange)
+  ax.hist(values_B, bins=5, range=(min(values_B), max(values_B)), histtype='step', color=plotify.c_blue)
+  ax.legend({'Number of measurements in bin', 'Gaussian Distribution', 'Measurement values'}, facecolor="#282D33", loc='upper left')
+  # plt.savefig(('plots/' + 'measuremens_no_uncertainties'), facecolor=plotify.background_color, dpi=180)
   ax.set_title("Measurements Without Uncertainties")
   ax.set_xlabel("Values")
 
-  plt.show()
+  # plt.show()
+
+  values_A_reduced = np.array([2.61, 2.46, 2.48])
+  uncertainties_A_reduced = np.array([0.10, 0.13, 0.12])
+
+  all_values = np.concatenate((values_A_reduced, values_B), axis=0)
+  all_uncertainties = np.concatenate((uncertainties_A_reduced, [uncertainty_B] * len(values_B)))
+
+
+  print(f'all_values = {all_values}')
+  print(f'all_uncertainties = {all_uncertainties}')
+
+  all_mean = np.mean(all_values)
+  all_std = np.mean(all_uncertainties)
+
+  print(f'all_mean = {all_mean}')
+  print(f'all_std = {all_std}')
 
 def exercise_2_2(correlation):
   v = 0.566e15
@@ -93,7 +119,7 @@ def exercise_2_2(correlation):
   T = 5.50e3
   T_error = 0.29e3
 
-  n_experiments = 1000
+  n_experiments = 10000
 
   # Define parameters for two random numbers (Gaussianly distributed):
   mu_v = v
@@ -121,12 +147,10 @@ def exercise_2_2(correlation):
   T_vals_mean = np.mean(T_vals)
 
 
+
   print(f'v_vals_mean = {v_vals_mean}')
-  print(f'v = {v}')
 
   print(f'T_vals_mean = {T_vals_mean}')
-  print(f'T = {T}')
-
 
   print(f'v_vals_std = {v_vals_std}')
   print(f'v_error = {v_error}')
@@ -147,10 +171,10 @@ def exercise_2_2(correlation):
 
 
 def main():
-  print('hello')
-  # exercise_2_1()
+  exercise_2_1()
   # exercise_2_2(0)
-  # exercise_2_2(0.87)
+  exercise_2_2(0.87)
+  
 
 if __name__ == '__main__':
   main()

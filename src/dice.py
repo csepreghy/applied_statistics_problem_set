@@ -22,6 +22,8 @@ xmin = 0
 xmax = 12
 
 observed_vals = np.array([185, 1149, 3265, 5475, 6114, 5194, 3067, 1331, 403, 105, 14, 4, 0])
+observed_vals_sum = np.sum(observed_vals)
+print(f'observed_vals_sum = {observed_vals_sum}')
 observed_vals_mean = np.mean(observed_vals)
 observed_vals_std = np.std(observed_vals)
 n_throws = np.sum(observed_vals)
@@ -32,12 +34,9 @@ p = 1/3
 for i in range(len(observed_vals)):
   expected_vals[i] = n_throws * func_binomial_pmf(i, 12, p)
 
-print(f'observed_vals = {observed_vals}')
-print(f'expected_vals = {expected_vals}')
-
 chi2, chi2_pval = chisquare(observed_vals, expected_vals)
-print(f'chi2 = {chi2}')
-print(f'chi2_pval = {chi2_pval}')
+print(f'chi2 binomial = {chi2}')
+print(f'chi2_pval binomial = {chi2_pval}')
 
 fig, ax = plotify.get_figax()
 
@@ -45,11 +44,16 @@ x = np.linspace(xmin, xmax, 1000)
 yvals_binomial = n_throws * func_binomial_pmf(x, 12, 1/3)
 yvals_poisson = n_throws * func_poisson_pmf(x, 4)
 yvals_gaussian = n_throws * func_gaussian_pdf(x, 4, 1.75)
-ax.scatter(xvals, observed_vals)
-ax.plot(x, yvals_binomial)
-ax.plot(x, yvals_poisson)
-ax.plot(x, yvals_gaussian)
+ax.plot(x, yvals_binomial, color=plotify.c_orange, label="Binomial")
+# ax.plot(x, yvals_poisson, color=plotify.c_green, label="Poisson")
+# ax.plot(x, yvals_gaussian, color=plotify.c_blue, label="Gaussian")
+ax.scatter(xvals, observed_vals, color=plotify.c_red, label="Observed")
 
+ax.set_xlabel("Number Of 5s & 6s per trial")
+ax.set_title("Outcomes for throwing 5 or 6 out 12 dice")
+ax.legend(facecolor="#282D33", loc="upper right")
+
+plt.savefig(('plots/' + 'dice_binom'), facecolor=plotify.background_color, dpi=180)
 plt.show()
 
 def chi2_gauss(sigma):
@@ -120,6 +124,7 @@ print(f'chi2_pval_poisson = {chi2_pval_poisson} \n\n')
 x0 = 1/3
 res_binomial = minimize(chi2_binomial, x0, method='Nelder-Mead', tol=1e-9)
 p = res_binomial.x
+print(f'p binomial = {p}')
 
 expected_binomial_vals = np.zeros(len(observed_vals))
 for i in range(len(observed_vals)):
@@ -133,11 +138,17 @@ fig2, ax2 = plotify.get_figax()
 yvals_binomial = n_throws * func_binomial_pmf(x, 12, p)
 yvals_poisson = n_throws * func_poisson_pmf(x, Lambda)
 yvals_gaussian = n_throws * func_gaussian_pdf(x, 4, sigma)
-ax2.scatter(xvals, observed_vals)
-ax2.plot(x, yvals_binomial)
-ax2.plot(x, yvals_poisson)
-ax2.plot(x, yvals_gaussian)
 
+ax2.plot(x, yvals_binomial, color=plotify.c_orange, label="Binomial")
+ax2.plot(x, yvals_poisson, color=plotify.c_green, label="Poisson")
+ax2.plot(x, yvals_gaussian, color=plotify.c_blue, label="Gaussian")
+ax2.scatter(xvals, observed_vals, color=plotify.c_red, label="Observed")
+
+ax2.set_xlabel("Number Of 5s & 6s per trial")
+ax2.set_title("Outcomes for throwing 5 or 6 out 12 dice (Fitted)")
+ax2.legend(facecolor="#282D33", loc="upper right")
+
+plt.savefig(('plots/' + 'dice_all_dist'), facecolor=plotify.background_color, dpi=180)
 plt.show()
 
 # def compute_chi2(p):
